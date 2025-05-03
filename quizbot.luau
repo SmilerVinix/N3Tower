@@ -1,39 +1,48 @@
--- N3Tower QuizBot by SmilerVinix
--- Original by Damian-11
+-- Load OrionLib
+local OrionLib = loadstring(game:HttpGet("https://raw.githubusercontent.com/shlexware/Orion/main/source"))()
 
-local CustomCategoryManager = {}
+-- Load your quiz data
+local QuizData = loadstring(game:HttpGet("https://raw.githubusercontent.com/SmilerVinix/N3Tower/main/quizbot.luau"))()
+local Questions = QuizData.N3TowerQuiz.Questions
 
-function CustomCategoryManager.New(categoryName)
-	local self = {}
-	self.CategoryName = categoryName
-	self.Questions = {}
+-- Create Window
+local Window = OrionLib:MakeWindow({
+	Name = "🧠 N3Tower Quiz",
+	HidePremium = false,
+	IntroText = "Welcome to N3Tower",
+	SaveConfig = false
+})
 
-	function self:Add(question, answers)
-		table.insert(self.Questions, {
-			Question = question,
-			Answers = answers
+-- Create Tab
+local QuizTab = Window:MakeTab({
+	Name = "Quiz Time",
+	Icon = "rbxassetid://4483345998",
+	PremiumOnly = false
+})
+
+-- Function to display a question
+local function DisplayQuestion(index)
+	local q = Questions[index]
+	QuizTab:AddParagraph("❓ Question", q.Question)
+
+	for _, answer in ipairs(q.Answers) do
+		QuizTab:AddButton({
+			Name = "Answer: " .. answer,
+			Callback = function()
+				OrionLib:MakeNotification({
+					Name = "Answer Selected",
+					Content = "You chose: " .. answer,
+					Time = 3
+				})
+			end
 		})
 	end
-
-	function self:Get()
-		return {
-			Name = self.CategoryName,
-			Questions = self.Questions
-		}
-	end
-
-	return self
 end
 
--- Create your custom category
-local n3Category = CustomCategoryManager.New("N3Tower Trivia")
+-- Add each question
+for i = 1, #Questions do
+	DisplayQuestion(i)
+end
 
--- Add your questions here
-n3Category:Add("What does 'N3' stand for?", {"Next-Gen 3", "Node 3", "Nothing 3", "Network 3"})
-n3Category:Add("Who created N3Tower?", {"SmilerVinix", "Damian-11", "OpenAI", "Roblox"})
-n3Category:Add("What platform is N3Tower made for?", {"Roblox", "Unity", "Godot", "Scratch"})
-
--- Export the quiz data
-return {
-	N3TowerQuiz = n3Category:Get()
-}
+-- GUI Loaded
+OrionLib:Init()
